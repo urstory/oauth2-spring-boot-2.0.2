@@ -1,5 +1,6 @@
 package com.aak.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -21,19 +22,24 @@ import javax.sql.DataSource;
 @Configuration
 public class ResourcesServerConfiguration  extends ResourceServerConfigurerAdapter {
 
-    @Bean
-    @ConfigurationProperties(prefix="spring.datasource")
-    public DataSource ouathDataSource(){return DataSourceBuilder.create().build();}
+    private final DataSource dataSource;
+    public ResourcesServerConfiguration(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources)throws Exception{
 
-        TokenStore tokenStore=new JdbcTokenStore(ouathDataSource());
-        resources.resourceId("product_api").tokenStore(tokenStore);
+        resources.resourceId("product_api").tokenStore(jdbcTokenStore());
 
     }
-    @Override
 
+    @Bean
+    public TokenStore jdbcTokenStore(){
+        return new JdbcTokenStore(dataSource);
+    }
+
+    @Override
     public void configure(HttpSecurity http) throws Exception{
 
 

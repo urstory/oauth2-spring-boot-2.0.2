@@ -1,5 +1,6 @@
 package com.aak.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -25,30 +26,27 @@ import javax.sql.DataSource;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource oauthDataSource() {
-        return DataSourceBuilder.create().build();
-    }
+    @Autowired
+    DataSource dataSource;
 
     @Bean
     public JdbcClientDetailsService clientDetailsService() {
-        return new JdbcClientDetailsService(oauthDataSource());
+        return new JdbcClientDetailsService(dataSource);
     }
 
     @Bean
     public TokenStore tokenStore() {
-        return new JdbcTokenStore(oauthDataSource());
+        return new JdbcTokenStore(dataSource);
     }
 
     @Bean
     public ApprovalStore approvalStore() {
-        return new JdbcApprovalStore(oauthDataSource());
+        return new JdbcApprovalStore(dataSource);
     }
 
     @Bean
     public AuthorizationCodeServices authorizationCodeServices() {
-        return new JdbcAuthorizationCodeServices(oauthDataSource());
+        return new JdbcAuthorizationCodeServices(dataSource);
     }
 
     @Override

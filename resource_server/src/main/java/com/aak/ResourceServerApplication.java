@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -18,10 +19,8 @@ import org.springframework.web.filter.CorsFilter;
 import javax.sql.DataSource;
 import java.util.Collections;
 
-@SpringBootApplication
 @Configuration
-@EnableAutoConfiguration
-@ComponentScan
+@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
 public class ResourceServerApplication {
 	@Bean
 	public FilterRegistrationBean corsFilter() {
@@ -37,12 +36,6 @@ public class ResourceServerApplication {
 		bean.setOrder(0);
 		return bean;
 	}
-
-	@Bean
-	@Primary
-	@ConfigurationProperties(prefix = "spring.datasource")
-	public DataSource mainDataSource() {
-		return DataSourceBuilder.create().type(HikariDataSource.class).build();}
 
 	public static void main(String[] args) {
 		SpringApplication.run(ResourceServerApplication.class, args);
